@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/shenghuikevin/cc-track/internal/analysis"
 	"github.com/shenghuikevin/cc-track/internal/config"
 	"github.com/shenghuikevin/cc-track/internal/output"
 	"github.com/shenghuikevin/cc-track/internal/store"
@@ -71,12 +72,19 @@ func runSessionList(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	t := output.NewTable("ID", "Project", "Branch", "Model", "Started", "Prompts", "Tools")
+	t := output.NewTable("ID", "Project", "Branch", "Model", "Started", "Prompts", "Tools", "Cost")
 	for _, sess := range sessions {
 		started := time.UnixMilli(sess.StartedAt).Format("01-02 15:04")
 		id := sess.ID
 		if len(id) > 12 {
 			id = id[:12]
+		}
+		pricing := analysis.LookupPricing(sess.ModelStr)
+		cost := analysis.CalculateCost(sess.TotalInputTokens, sess.TotalOutputTokens,
+			sess.TotalCacheReadTokens, sess.TotalCacheCreationTokens, pricing)
+		costStr := "-"
+		if cost.TotalCost > 0 {
+			costStr = fmt.Sprintf("$%.2f", cost.TotalCost)
 		}
 		t.AddRow(
 			id,
@@ -86,6 +94,7 @@ func runSessionList(cmd *cobra.Command, args []string) error {
 			started,
 			fmt.Sprintf("%d", sess.TotalPrompts),
 			fmt.Sprintf("%d", sess.TotalToolCalls),
+			costStr,
 		)
 	}
 	fmt.Print(t.String())
@@ -139,6 +148,13 @@ func printTimeline(tl *store.SessionTimeline) {
 			formatTokens(sess.TotalCacheReadTokens),
 			formatTokens(sess.TotalCacheCreationTokens),
 		)
+		pricing := analysis.LookupPricing(sess.ModelStr)
+		cost := analysis.CalculateCost(sess.TotalInputTokens, sess.TotalOutputTokens,
+			sess.TotalCacheReadTokens, sess.TotalCacheCreationTokens, pricing)
+		if cost.TotalCost > 0 {
+			fmt.Printf("  Cost:     $%.2f (in: $%.4f, out: $%.4f, cache-read: $%.4f, cache-create: $%.4f)\n",
+				cost.TotalCost, cost.InputCost, cost.OutputCost, cost.CacheReadCost, cost.CacheCreationCost)
+		}
 	}
 
 	fmt.Println("\nTimeline:")

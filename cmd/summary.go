@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/shenghuikevin/cc-track/internal/analysis"
 	"github.com/shenghuikevin/cc-track/internal/config"
 	"github.com/shenghuikevin/cc-track/internal/output"
 	"github.com/shenghuikevin/cc-track/internal/store"
@@ -29,6 +30,12 @@ func init() {
 	rootCmd.AddCommand(summaryCmd)
 }
 
+// summaryWithCost wraps SessionSummary with cost data for JSON output.
+type summaryWithCost struct {
+	*store.SessionSummary
+	Cost *analysis.CostBreakdown `json:"cost,omitempty"`
+}
+
 func runSummary(cmd *cobra.Command, args []string) error {
 	sinceMs, untilMs := summaryTimeRange()
 
@@ -47,8 +54,10 @@ func runSummary(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	cost := calcCostFromStore(s, sinceMs, untilMs)
+
 	if jsonOutput {
-		j, err := output.JSON(sum)
+		j, err := output.JSON(summaryWithCost{sum, cost})
 		if err != nil {
 			return err
 		}
@@ -56,8 +65,27 @@ func runSummary(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	printSummary(sum, sinceMs)
+	printSummary(sum, sinceMs, cost)
 	return nil
+}
+
+func calcCostFromStore(s *store.Store, sinceMs, untilMs int64) *analysis.CostBreakdown {
+	byModel, err := s.QueryTokensByModel(sinceMs, untilMs)
+	if err != nil {
+		return nil
+	}
+	total := &analysis.CostBreakdown{}
+	for _, mt := range byModel {
+		pricing := analysis.LookupPricing(mt.Model)
+		c := analysis.CalculateCost(mt.TotalInputTokens, mt.TotalOutputTokens,
+			mt.TotalCacheReadTokens, mt.TotalCacheCreationTokens, pricing)
+		total.InputCost += c.InputCost
+		total.OutputCost += c.OutputCost
+		total.CacheReadCost += c.CacheReadCost
+		total.CacheCreationCost += c.CacheCreationCost
+		total.TotalCost += c.TotalCost
+	}
+	return total
 }
 
 func summaryTimeRange() (int64, int64) {
@@ -83,7 +111,7 @@ func summaryTimeRange() (int64, int64) {
 	return today.UnixMilli(), untilMs
 }
 
-func printSummary(sum *store.SessionSummary, sinceMs int64) {
+func printSummary(sum *store.SessionSummary, sinceMs int64, cost *analysis.CostBreakdown) {
 	since := time.UnixMilli(sinceMs).Format("2006-01-02 15:04")
 	fmt.Printf("Summary since %s\n\n", since)
 
@@ -101,6 +129,15 @@ func printSummary(sum *store.SessionSummary, sinceMs int64) {
 		fmt.Printf("    Cache Read:     %s\n", formatTokens(sum.TotalCacheReadTokens))
 		fmt.Printf("    Cache Creation: %s\n", formatTokens(sum.TotalCacheCreationTokens))
 		fmt.Printf("    Total:          %s\n", formatTokens(totalTokens))
+	}
+
+	if cost != nil && cost.TotalCost > 0 {
+		fmt.Printf("\n  Estimated Cost:\n")
+		fmt.Printf("    Input:          $%.4f\n", cost.InputCost)
+		fmt.Printf("    Output:         $%.4f\n", cost.OutputCost)
+		fmt.Printf("    Cache Read:     $%.4f\n", cost.CacheReadCost)
+		fmt.Printf("    Cache Creation: $%.4f\n", cost.CacheCreationCost)
+		fmt.Printf("    Total:          $%.2f\n", cost.TotalCost)
 	}
 
 	if len(sum.ToolBreakdown) > 0 {
