@@ -137,6 +137,10 @@ All data stays local in `~/.cc-track/data.db`. Nothing is sent anywhere.
 - [spf13/cobra](https://github.com/spf13/cobra) — CLI framework
 - [charmbracelet/lipgloss](https://github.com/charmbracelet/lipgloss) — terminal styling
 
+## Language
+
+[中文文档](README_CN.md)
+
 ## License
 
 MIT
