@@ -1,5 +1,7 @@
 # cc-track
 
+[中文文档](README_CN.md)
+
 Local-first CLI tool for analyzing [Claude Code](https://docs.anthropic.com/en/docs/claude-code) usage — not just how much you spent, but whether it was worth it.
 
 ## Why cc-track?
@@ -136,10 +138,6 @@ All data stays local in `~/.cc-track/data.db`. Nothing is sent anywhere.
 - [modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite) — pure-Go SQLite, no CGO
 - [spf13/cobra](https://github.com/spf13/cobra) — CLI framework
 - [charmbracelet/lipgloss](https://github.com/charmbracelet/lipgloss) — terminal styling
-
-## Language
-
-[中文文档](README_CN.md)
 
 ## License
 
