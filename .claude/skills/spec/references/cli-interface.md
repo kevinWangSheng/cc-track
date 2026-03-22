@@ -46,7 +46,7 @@ cc-track summary --since 2026-03-01 # 自定义范围
 cc-track summary --json             # JSON 输出
 ```
 
-输出：sessions 数、prompts 数、tool calls 按类型分布（名称+百分比）、错误率、总时长。
+输出：sessions 数、prompts 数、tool calls 按类型分布（名称+百分比）、错误率、总时长、费用估算（Phase 5）。
 
 ## cc-track session
 
@@ -63,9 +63,11 @@ cc-track session show <id>          # 支持前缀匹配
 ```
 cc-track waste                      # 分析最近 sessions
 cc-track waste --session <id>       # 指定 session
+cc-track waste --summary            # 只输出建议汇总（Phase 7）
 ```
 
 5 种检测模式：重复调用、过度读取、失败重试、Edit 反复、僵尸 session。
+Phase 7 后每条 finding 附带改进建议。
 
 ## cc-track roi
 
@@ -83,3 +85,31 @@ cc-track roi --repo /path
 cc-track export --format csv|json
 cc-track export --since 2026-03-01
 ```
+
+## cc-track trend（Phase 6）
+
+```
+cc-track trend                      # 最近 7 天，按天展示
+cc-track trend --month              # 最近 30 天
+cc-track trend --json               # JSON 输出
+```
+
+输出：每日 sessions 数、token 消耗、费用、waste 数的时间序列。终端 ASCII 可视化。
+
+## cc-track report（Phase 8）
+
+```
+cc-track report --format md         # Markdown 周报
+cc-track report --format html       # HTML 报告
+cc-track report --since 2026-03-01  # 自定义范围
+```
+
+输出：费用摘要、趋势、waste 分析、ROI、top sessions 的综合报告。
+
+## cc-track watch（Phase 8，可选）
+
+```
+cc-track watch                      # 实时终端 dashboard
+```
+
+实时监听当前 session，展示 token 消耗和工具调用流。
