@@ -1,0 +1,1 @@
+{"session_id":"sess-001","cwd":"/tmp/testproject","hook_event_name":"PostToolUse","tool_name":"Read","tool_input":{"file_path":"/tmp/foo.go"},"tool_response":{"content":"package main"},"tool_use_id":"tu-001"}
