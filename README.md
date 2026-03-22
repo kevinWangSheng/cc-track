@@ -1,6 +1,24 @@
 # cc-track
 
-Local-first CLI tool for monitoring [Claude Code](https://docs.anthropic.com/en/docs/claude-code) usage. Built with Go + SQLite, zero external dependencies, no daemon.
+Local-first CLI tool for analyzing [Claude Code](https://docs.anthropic.com/en/docs/claude-code) usage — not just how much you spent, but whether it was worth it.
+
+## Why cc-track?
+
+Most monitoring tools tell you **how much** you spent (tokens, API calls, dollars). cc-track tells you **how well** you spent it.
+
+| | Anthropic Console / SaaS Observability | cc-track |
+|---|---|---|
+| Data location | Cloud / third-party | **100% local** (`~/.cc-track/data.db`) |
+| Granularity | API call level | Session → Prompt → Tool Call full chain |
+| Perspective | "How much did I spend?" | **"Was it worth it?"** (waste + ROI) |
+| Setup | API proxy / SDK integration | One command, zero intrusion |
+| Dependencies | Server, network | **None** — no daemon, no network |
+
+**Key differentiators:**
+
+- **Waste Detection** — identifies duplicate tool calls, excessive file reads, failed retries, edit reverts, and zombie sessions. Tells you where tokens are being wasted.
+- **ROI Analysis** — correlates Claude Code sessions with `git log` output (commits, lines added/removed) to answer "what did this investment produce?"
+- **Privacy First** — all data stays on your machine. Nothing is sent anywhere, ever.
 
 ## How It Works
 
@@ -58,6 +76,30 @@ cc-track session show <id>        # detailed session with timeline
 ```
 
 Session detail includes full chronological timeline of prompts, tool calls, and stop events.
+
+### Waste Detection
+
+```bash
+cc-track waste                    # analyze recent 10 sessions
+cc-track waste --session <id>     # analyze a specific session
+```
+
+Detects 5 patterns:
+- **Duplicate Calls** — same tool + similar input, 3+ times within 60s
+- **Excessive Reads** — same file read 5+ times in one session
+- **Failed Retries** — same tool fails consecutively 3+ times
+- **Edit Reverts** — A→B→A pattern on the same file
+- **Zombie Sessions** — >30 min duration but almost no activity
+
+### ROI Analysis
+
+```bash
+cc-track roi                      # today's ROI
+cc-track roi --since 2025-03-01   # custom date range
+cc-track roi --repo /path/to/repo # override repo path
+```
+
+Correlates session data with git output: sessions, duration, tool calls, commits, lines added/removed. Automatically deduplicates when multiple sessions point to the same repo.
 
 ### Export
 
