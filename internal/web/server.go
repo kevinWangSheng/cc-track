@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"strconv"
@@ -29,6 +30,7 @@ func Serve(port int) error {
 	mux.Handle("/", http.FileServer(http.FS(sub)))
 
 	// API routes
+	mux.HandleFunc("/api/viewport", handleViewport)
 	mux.HandleFunc("/api/summary", handleSummary)
 	mux.HandleFunc("/api/trend", handleTrend)
 	mux.HandleFunc("/api/sessions", handleSessions)
@@ -82,6 +84,27 @@ func writeError(w http.ResponseWriter, code int, msg string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(map[string]string{"error": msg})
+}
+
+// viewportData stores the latest viewport report from the browser.
+var viewportData []byte
+
+// POST /api/viewport — browser reports its viewport dimensions
+// GET  /api/viewport — returns the latest reported viewport
+func handleViewport(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		viewportData = body
+		w.WriteHeader(200)
+		w.Write([]byte(`{"ok":true}`))
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	if viewportData == nil {
+		w.Write([]byte(`{"error":"no viewport data yet, open the dashboard in a browser first"}`))
+		return
+	}
+	w.Write(viewportData)
 }
 
 // GET /api/summary?period=week|month&since=2026-03-01

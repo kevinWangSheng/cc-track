@@ -260,6 +260,22 @@ function loadAll() {
 
 loadAll();
 setInterval(loadAll, 30000);
+
+// Report viewport dimensions to server for debugging
+function reportViewport() {
+  const dash = document.querySelector('.dashboard');
+  const data = {
+    window_width: window.innerWidth,
+    window_height: window.innerHeight,
+    dashboard_scroll_height: dash ? dash.scrollHeight : 0,
+    dashboard_client_height: dash ? dash.clientHeight : 0,
+    overflow: dash ? dash.scrollHeight > dash.clientHeight : false,
+    device_pixel_ratio: window.devicePixelRatio
+  };
+  fetch('/api/viewport', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data) });
+}
+setTimeout(reportViewport, 2000);
+window.addEventListener('resize', reportViewport);
 </script>
 </body>
 </html>
