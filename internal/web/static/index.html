@@ -10,8 +10,8 @@
   html, body { height: 100%; overflow: hidden; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e1e4e8; display: flex; flex-direction: column; }
 
-  .header { padding: 8px 20px; border-bottom: 1px solid #21262d; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-  .header h1 { font-size: 16px; font-weight: 600; }
+  .header { padding: 6px 16px; border-bottom: 1px solid #21262d; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .header h1 { font-size: 14px; font-weight: 600; }
   .header h1 span { color: #58a6ff; }
   .controls { display: flex; gap: 6px; }
   .controls button { padding: 4px 12px; border: 1px solid #30363d; border-radius: 6px; background: #21262d; color: #c9d1d9; cursor: pointer; font-size: 12px; }
@@ -19,20 +19,20 @@
   .controls button:hover { background: #30363d; }
   .controls button.active:hover { background: #388bfd; }
 
-  .dashboard { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: auto 1fr 1fr; gap: 10px; padding: 10px 16px; overflow: hidden; min-height: 0; }
+  .dashboard { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: 50px 1fr 1fr; gap: 8px; padding: 8px 12px; overflow: hidden; min-height: 0; }
 
   /* Row 1: 4 stat cards */
-  .card { background: #161b22; border: 1px solid #21262d; border-radius: 6px; padding: 10px 14px; }
+  .card { background: #161b22; border: 1px solid #21262d; border-radius: 6px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; }
   .card .label { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
-  .card .value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+  .card .value { font-size: 20px; font-weight: 700; }
   .card .value.cost { color: #f0883e; }
   .card .value.sessions { color: #58a6ff; }
   .card .value.tools { color: #56d364; }
   .card .value.error { color: #f85149; }
 
   /* Row 2: charts */
-  .chart-card { background: #161b22; border: 1px solid #21262d; border-radius: 6px; padding: 10px 14px; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
-  .chart-card h3 { font-size: 11px; color: #8b949e; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+  .chart-card { background: #161b22; border: 1px solid #21262d; border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  .chart-card h3 { font-size: 10px; color: #8b949e; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
   .chart-card .chart-wrap { flex: 1; position: relative; min-height: 0; }
   .chart-card canvas { position: absolute; top: 0; left: 0; width: 100% !important; height: 100% !important; }
 
@@ -43,8 +43,8 @@
   /* ROI */
   .roi-grid { display: flex; align-items: center; justify-content: space-around; flex: 1; }
   .roi-item { text-align: center; }
-  .roi-item .num { font-size: 20px; font-weight: 700; color: #56d364; }
-  .roi-item .desc { font-size: 10px; color: #8b949e; margin-top: 2px; }
+  .roi-item .num { font-size: 18px; font-weight: 700; color: #56d364; }
+  .roi-item .desc { font-size: 9px; color: #8b949e; margin-top: 2px; }
 
   /* Tables */
   .table-wrap { flex: 1; overflow-y: auto; min-height: 0; }
