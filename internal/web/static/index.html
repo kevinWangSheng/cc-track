@@ -19,7 +19,7 @@
   .controls button:hover { background: #30363d; }
   .controls button.active:hover { background: #388bfd; }
 
-  .dashboard { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: 50px 1fr 1fr; gap: 8px; padding: 8px 12px; overflow: hidden; min-height: 0; }
+  .dashboard { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; grid-template-rows: 50px minmax(0, 1fr) minmax(0, 1fr); gap: 8px; padding: 8px 12px; overflow: hidden; }
 
   /* Row 1: 4 stat cards */
   .card { background: #161b22; border: 1px solid #21262d; border-radius: 6px; padding: 6px 12px; display: flex; align-items: center; gap: 8px; }
